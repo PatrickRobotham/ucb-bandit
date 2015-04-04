@@ -2,8 +2,8 @@
 
 # A has true conversion rate of 0.1, B of 0.2
 prob.conversion <- c(0.1,0.2)
-n = 10000
-num.sims = 1000
+n = 1000000
+num.sims = 1
 
 get_conversion <- function(version){
   return(runif(1) < prob.conversion[version])
@@ -114,16 +114,16 @@ simulateRandom  = data.frame(t(replicate(num.sims,abrandom(n))))
 simulateRandom$p = unlist(simulateRandom$p)
 simulateRandom$totalConversions = unlist(simulateRandom$totalConversions)
 
-simulateUCB = data.frame(t(replicate(num.sims,abucb(1000))))
+simulateUCB = data.frame(t(replicate(num.sims,abucb(n))))
 simulateUCB$p = unlist(simulateUCB$p)
 simulateUCB$totalConversions = unlist(simulateUCB$totalConversions)
 
 
-simulateGreedy5050 = data.frame(t(replicate(100,abgreedy(1000,0.5))))
+simulateGreedy5050 = data.frame(t(replicate(num.sims,abgreedy(n,0.5))))
 simulateGreedy5050$p = unlist(simulateGreedy5050$p)
 simulateGreedy5050$totalConversions = unlist(simulateGreedy5050$totalConversions)
 
-simulateGreedy9010 = data.frame(t(replicate(100,abgreedy(1000,0.1))))
+simulateGreedy9010 = data.frame(t(replicate(num.sims,abgreedy(n,0.1))))
 simulateGreedy9010$p = unlist(simulateGreedy9010$p)
 simulateGreedy9010$totalConversions = unlist(simulateGreedy9010$totalConversions)
 
