@@ -2,7 +2,8 @@
 
 # A has true conversion rate of 0.1, B of 0.2
 prob.conversion <- c(0.1,0.2)
-
+n = 10000
+num.sims = 1000
 
 get_conversion <- function(version){
   return(runif(1) < prob.conversion[version])
@@ -58,6 +59,7 @@ abrandom <- function(num_trials){
   ))
 }
 
+
 #A/B Testing: Epsilon Greedy Version
 abgreedy <- function(num_trials,epsilon){
   visitors <- c(1,1)
@@ -69,7 +71,7 @@ abgreedy <- function(num_trials,epsilon){
       version <- floor(runif(n=1,min=1.5,max=2.5))
     } else {
       # exploit
-      version <- order(conversions/visits,decreasing=TRUE)[1]
+      version <- order(conversions/visitors,decreasing=TRUE)[1]
     }
     # Check if we got a conversion
     visitors[version] <- visitors[version] + 1
@@ -108,4 +110,37 @@ abucb <- function(num_trials){
   ))
 }
 
+simulateRandom  = data.frame(t(replicate(num.sims,abrandom(n))))
+simulateRandom$p = unlist(simulateRandom$p)
+simulateRandom$totalConversions = unlist(simulateRandom$totalConversions)
 
+simulateUCB = data.frame(t(replicate(num.sims,abucb(1000))))
+simulateUCB$p = unlist(simulateUCB$p)
+simulateUCB$totalConversions = unlist(simulateUCB$totalConversions)
+
+
+simulateGreedy5050 = data.frame(t(replicate(100,abgreedy(1000,0.5))))
+simulateGreedy5050$p = unlist(simulateGreedy5050$p)
+simulateGreedy5050$totalConversions = unlist(simulateGreedy5050$totalConversions)
+
+simulateGreedy9010 = data.frame(t(replicate(100,abgreedy(1000,0.1))))
+simulateGreedy9010$p = unlist(simulateGreedy9010$p)
+simulateGreedy9010$totalConversions = unlist(simulateGreedy9010$totalConversions)
+
+print(paste("A/B Testing Results - n:" , n , "num.sims: " ,num.sims))
+print("Random")
+print(paste("Conversion Rate:",mean(simulateRandom$totalConversions)/n))
+print(paste("Signifance Percentage:",sum(simulateRandom$p < 0.05) / num.sims))
+
+print("UCB")
+print(paste("Conversion Rate:",mean(simulateUCB$totalConversions)/n))
+print(paste("Signifance Percentage:",sum(simulateUCB$p < 0.05) / num.sims))
+
+print("Greedy - epsilon=0.5")
+print(paste("Conversion Rate:",mean(simulateGreedy5050$totalConversions)/n))
+print(paste("Signifance Percentage:",sum(simulateGreedy5050$p < 0.05) / num.sims))
+
+
+print("Greedy - epsilon=0.1")
+print(paste("Conversion Rate:",mean(simulateGreedy9010$totalConversions)/n))
+print(paste("Signifance Percentage:",sum(simulateGreedy9010$p < 0.05) / num.sims))
